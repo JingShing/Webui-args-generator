@@ -1,6 +1,7 @@
 English | [繁體中文](README_TCH.md)
 # Webui-args-generator
 This tool is for Stable-diffusion-webui.
+
 A simple html can help you select args and generate the bat you want.
 
 ## UI
