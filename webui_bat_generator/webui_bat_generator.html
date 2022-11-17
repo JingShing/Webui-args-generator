@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webui-user.bat generator</title>
+</head>
+<body>
+    <form id="check_lists">
+        Please check the args you want<br>
+    </form>
+    <p>
+        result:
+        <br />
+        <p id = "result_text"></p>
+    </p>
+    <p>
+        Your args:
+        <br />
+        <p id = "args_result"></p>
+        <label for="from">additional args:</label>
+        <br />
+        <input type="text" id="addtional_textbox" value="" style="height: 200px; width: 1100px;" onclick="this.value=''"/>
+    </p>
+    <p>
+        <button type="button" id="save_file_button">Download the bat</button>
+        <button type="button" id="clear_button">clear all</button>
+    </p>
+    <script>
+        var save_file_pre_text = '@echo off\n\nset PYTHON=\nset GIT=\nset VENV_DIR=\nset COMMANDLINE_ARGS='
+        var save_file_post_text = '<br><br>call webui.bat'
+        var checkbox_list = ["xformers", "share", "ngrok", "deepdanbooru"];
+        var checkbox_list_name = ["xformers", "share", "ngrok", "deepdanbooru"];
+        var result = "";
+        var args = "";
+        function set_up_list(){
+            var pre_word = "Please check the args you want<br>";
+            var display_check_box = pre_word;
+            for(let i=0;i<checkbox_list.length;i++)display_check_box+='<input type="checkbox" id="' + checkbox_list[i] + '">' + checkbox_list_name[i] + '<br>';
+            document.getElementById("check_lists").innerHTML = display_check_box;
+        }
+        function get_text_from_port(){
+            args = "";
+            result = save_file_pre_text;
+            for(let i=0;i<checkbox_list.length;i++){
+                if (checkbox_list[i]=="ngrok"){
+                    if (document.getElementById(checkbox_list[i]).checked)args += "--" + checkbox_list[i] + " ";
+                }
+                else if(document.getElementById(checkbox_list[i]).checked)args += "--" + checkbox_list[i] + " ";
+            }
+            args += document.getElementById("addtional_textbox").value;
+            result += args;
+            result += save_file_post_text;
+            display_update(result, args);
+        }
+        function display_update(result_text, args_text){
+            result_text = result_text.replace(/(\r\n|\r|\n)/g, '<br>');
+            // make all \n to <br>
+            document.getElementById("result_text").innerHTML = result_text;
+            document.getElementById("args_result").innerHTML = args;
+        }
+        function export_file(){
+            result = result.replace(/<br\s*[\/]?>/gi, "\n");
+            // it gonna take my life to make <br> to \n
+            filename = "webui-user";
+            // file_type = '.txt';
+            file_type = '.bat';
+            text = result;
+            let aTag = document.createElement('a');
+            let blob = new Blob([text]);
+            aTag.download = filename + file_type;
+            aTag.href = URL.createObjectURL(blob);
+            aTag.click();
+            URL.revokeObjectURL(blob);
+		}
+        function clear_all_port(){
+            document.getElementById("addtional_textbox").value = ""
+            args = "";
+            result = "";
+            for(let i=0;i<checkbox_list.length;i++){
+                document.getElementById(checkbox_list[i]).checked=false;
+            }
+        }
+        set_up_list();
+        get_text_from_port();
+        document.addEventListener('click', get_text_from_port, false);
+        document.getElementById("save_file_button").addEventListener('click', export_file, false);
+        document.getElementById("clear_button").addEventListener('click', clear_all_port, false);
+    </script>
+</body>
+</html>
